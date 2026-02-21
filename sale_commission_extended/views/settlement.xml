@@ -6,6 +6,13 @@
         <field name="model">sale.commission.settlement</field>
         <field name="inherit_id" ref="sale_commission.view_settlement_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//form/header" position="inside">
+                <button name="button_recompute_lines"
+                    string="Recompute Lines"
+                    type="object"
+                    attrs="{'invisible': [('state', '!=', 'settled')]}"
+                    confirm="This will recalculate all commission amounts on settlement lines. Continue?"/>
+            </xpath>
             <xpath expr="//form/group[2]" position="attributes">
                 <attribute name="string"/>
             </xpath>
