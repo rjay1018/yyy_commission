@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="view_settlement_inherit_form">
+        <field name="name">settlement.inherit.form</field>
+        <field name="model">sale.commission.settlement</field>
+        <field name="inherit_id" ref="sale_commission.view_settlement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/group[2]" position="attributes">
+                <attribute name="string"/>
+            </xpath>
+            <xpath expr="//form/group[2]" position="before">
+                <div><h2>Partner Category</h2></div>
+            </xpath>
+            <xpath expr="//form/group[2]" position="after">
+                <div><h2>Product Category</h2></div>
+                <group colspan="4">
+                    <field name="categ_lines" nolabel="1">
+                        <tree>
+                            <field name="date"/>
+                            <field name="invoice"/>
+                            <field name="invoice_line"/>
+                            <field name="commission"/>
+                            <field name="settled_amount" sum="Total"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='lines']/tree/field[@name='settled_amount']" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </xpath>
+            <field name="total" position="replace">
+                <field name="total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            </field>
+        </field>
+    </record>
+</odoo>

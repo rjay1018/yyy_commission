@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="sale_commission_inherit_form">
+        <field name="name">sale.commission.inherit.form</field>
+        <field name="model">sale.commission</field>
+        <field name="inherit_id" ref="sale_commission.sale_commission_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/group[2]" position="replace">
+                <field name="commission_type" invisible="1"/>
+                <group string="Rates">
+                    <group colspan="4">
+                        <field name="fix_qty"
+                            attrs="{'invisible': [('commission_type', '=', 'section')], 'required': [('commission_type', '!=', 'section')]}"/>
+                        <field name="uom_ids" colspan="4"
+                            attrs="{'invisible': [('commission_type', '!=', 'fix')], 'required': [('commission_type', '=', 'fix')]}">
+                            <tree>
+                                <field name="name"/>
+                                <field name="category_id"/>
+                                <field name="uom_type"/>
+                                <field name="factor" digits="[42, 5]"/>
+                                <field name="factor_inv" digits="[42, 5]"/>
+                                <field name="rounding" digits="[42, 5]"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <field name="sections" colspan="4" nolabel="1"
+                        attrs="{'invisible': [('commission_type', '!=', 'section')]}">
+                        <tree editable="bottom">
+                            <field name="amount_from"/>
+                            <field name="amount_to"/>
+                            <field name="percent"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_sale_commission_mixin_categ_only">
+        <field name="model">sale.commission.mixin</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_commission_mixin_agent_only"/>
+        <field name="arch" type="xml">
+            <field name="agents" position="before">
+                <separator string="Partner Category" colspan="4"/>
+            </field>
+            <field name="agents" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <field name="agents" position="after">
+                <separator string="Product Category" colspan="4"/>
+                <field name="product_categ_comm_ids" readonly="1"
+                    attrs="{'readonly': [('commission_free', '=', True)]}">
+                    <tree>
+                        <field name="categ_id"/>
+                        <field name="agent"/>
+                        <field name="qty"/>
+                        <field name="commission"/>
+                        <field name="amount" sum="Total"/>
+                    </tree>
+                </field>
+            </field>
+        </field>
+    </record>
+
+
+     <record model="ir.ui.view" id="sale_order_line_agent_inherit_tree">
+        <field name="name">sale.order.line.agent.inherit.tree</field>
+        <field name="model">sale.order.line.agent</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_order_line_tree"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </field>
+        </field>
+    </record>
+
+</odoo>

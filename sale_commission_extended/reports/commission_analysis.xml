@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Sale Orders -->
+    <record id="sale_order_commission_analysis_inherit_graph" model="ir.ui.view">
+        <field name="name">sale.order.commission.analysis.inherit.graph</field>
+        <field name="model">sale.order.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_order_commission_analysis_graph"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="string">Commission Amount</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record id="sale_order_commission_analysis_inherit_pivot" model="ir.ui.view">
+        <field name="name">sale.order.commission.analysis.inherit.pivot</field>
+        <field name="model">sale.order.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_order_commission_analysis_pivot"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="string">Commission Amount</attribute>
+            </field>
+            <field name="amount" position="before">
+                <field name="quantity" type="measure"/>
+                <field name="price_unit" type="measure"/>
+                <field name="price_subtotal" type="measure"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="sale_order_commission_analysis_inherit_search" model="ir.ui.view">
+        <field name="name">sale.order.commission.analysis.inherit.search</field>
+        <field name="model">sale.order.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_order_commission_analysis_search"/>
+        <field name="arch" type="xml">
+            <filter name="Category" position="after">
+                <filter name="grp_commission" string="Commission Type" context="{'group_by': 'commission_id'}"/>
+                <filter name="grp_product" string="Product" context="{'group_by': 'product_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="sale_commission.action_sale_order_commission_analysis_report" model="ir.actions.act_window">
+        <field name="context">{'search_default_Agent': 1, 'search_default_Customer': 1, 'search_default_grp_commission': 1, 'search_default_grp_product': 1}</field>
+    </record>
+
+
+    <!-- Invoices -->
+    <record id="sale_commission_analysis_inherit_graph" model="ir.ui.view">
+        <field name="name">sale.commission.analysis.inherit.graph</field>
+        <field name="model">sale.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_commission_analysis_graph"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="string">Commission Amount</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record id="sale_commission_analysis_inherit_pivot" model="ir.ui.view">
+        <field name="name">sale.commission.analysis.inherit.pivot</field>
+        <field name="model">sale.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_commission_analysis_pivot"/>
+        <field name="arch" type="xml">
+            <field name="amount" position="attributes">
+                <attribute name="string">Commission Amount</attribute>
+            </field>
+            <field name="amount" position="before">
+                <field name="quantity" type="measure"/>
+                <field name="price_unit" type="measure"/>
+                <field name="price_subtotal" type="measure"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="sale_commission_analysis_inherit_search" model="ir.ui.view">
+        <field name="name">sale.commission.analysis.inherit.search</field>
+        <field name="model">sale.commission.analysis.report</field>
+        <field name="inherit_id" ref="sale_commission.view_sale_commission_analysis_search"/>
+        <field name="arch" type="xml">
+            <filter name="Category" position="after">
+                <filter name="grp_commission" string="Commission Type" context="{'group_by': 'commission_id'}"/>
+                <filter name="grp_product" string="Product" context="{'group_by': 'product_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="sale_commission.action_sale_commission_analysis_report" model="ir.actions.act_window">
+        <field name="context">{'search_default_Agent': 1, 'search_default_Customer': 1, 'search_default_grp_commission': 1, 'search_default_grp_product': 1}</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="sale_commission.report_settlement">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div class="row mt32 mb32">
+                            <div class="col-4" t-if="o.agent">
+                                <strong>Agent:</strong>
+                                <p t-field="o.agent"/>
+                            </div>
+                            <div class="col-2" t-if="o.date_from">
+                                <strong>From:</strong>
+                                <p t-field="o.date_from"/>
+                            </div>
+                            <div class="col-2" t-if="o.date_to">
+                                <strong>To:</strong>
+                                <p t-field="o.date_to"/>
+                            </div>
+                        </div>
+
+                        <h5>Partner Category</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Invoice Date</th>
+                                    <th>Invoice</th>
+                                    <th>Invoice Line</th>
+                                    <th>Commission</th>
+                                    <th class="text-right">Amount Settled</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.lines" t-as="l">
+                                    <td><span t-field="l.date"/></td>
+                                    <td><span t-field="l.invoice"/></td>
+                                    <td><span t-field="l.invoice_line"/></td>
+                                    <td><span t-field="l.commission"/></td>
+                                    <td class="text-right"><span t-esc="'{0:,.2f}'.format(l.settled_amount)"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="py-2"/>
+                        <h5>Product Category</h5>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Invoice Date</th>
+                                    <th>Invoice</th>
+                                    <th>Invoice Line</th>
+                                    <th>Commission</th>
+                                    <th class="text-right">Amount Settled</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.categ_lines" t-as="l">
+                                    <td><span t-field="l.date"/></td>
+                                    <td><span t-field="l.invoice"/></td>
+                                    <td><span t-field="l.invoice_line"/></td>
+                                    <td><span t-field="l.commission"/></td>
+                                    <td class="text-right"><span t-esc="'{0:,.2f}'.format(l.settled_amount)"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row justify-content-end">
+                            <div class="col-3 text-right">
+                                TOTAL:  <span class="font-weight-bold" t-esc="'{0:,.2f}'.format(o.total)"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <report id="sale_commission.action_report_settlement"
+        model="sale.commission.settlement"
+        string="Settlement Report"
+        report_type="qweb-pdf"
+        name="sale_commission.report_settlement"
+        file="sale_commission.report_settlement"/>
+
+</odoo>

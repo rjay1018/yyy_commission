@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_category_inherit_form" model="ir.ui.view">
+        <field name="name">product.category.inherit.form</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_form_view" />
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button type="object" name="apply_commission_to_products"
+                        string="Apply Commission to Products" class="oe_highlight"/>
+                </header>
+            </xpath>
+            <field name="parent_id" position="after">
+                <field name="has_commission"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_category_inherit_tree" model="ir.ui.view">
+        <field name="name">product.category.inherit.tree</field>
+        <field name="model">product.category</field>
+        <field name="inherit_id" ref="product.product_category_list_view" />
+        <field name="arch" type="xml">
+            <field name="display_name" position="after">
+                <field name="has_commission"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
