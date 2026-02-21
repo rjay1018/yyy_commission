@@ -15,7 +15,8 @@
         'views/account_invoice.xml',
         'views/settlement.xml',
         'reports/commission_analysis.xml',
-        'reports/settlement_report.xml'
+        'reports/settlement_report.xml',
+        'wizard/recompute_commission_view.xml'
     ],
     'installable': True
 }

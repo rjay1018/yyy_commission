@@ -43,6 +43,63 @@ class AccountInvoice(models.Model):
             domain.extend([('id', 'in', agent_ids)])
         return {'domain': {'agent_id': domain}}
 
+    @api.multi
+    def button_recompute_commissions(self):
+        """Button action to recompute commissions for selected invoices."""
+        for invoice in self:
+            invoice._recompute_commissions()
+        return True
+
+    @api.multi
+    def _recompute_commissions(self):
+        """Recompute commission lines for this invoice.
+        
+        1. Backfill categ_id on lines from product if missing
+        2. Backfill agent_id and computation from source sale order if missing
+        3. Clear and recompute partner category and product category commissions
+        """
+        self.ensure_one()
+        _logger.info('Recomputing commissions for invoice %s', self.display_name)
+
+        # Step 1: Backfill agent_id and computation from sale order
+        if not self.agent_id or not self.computation:
+            for line in self.invoice_line_ids:
+                for sol in line.sale_line_ids:
+                    if sol.order_id.agent_id and not self.agent_id:
+                        self.agent_id = sol.order_id.agent_id
+                    if sol.order_id.computation and not self.computation:
+                        self.computation = sol.order_id.computation
+                    if self.agent_id and self.computation:
+                        break
+                if self.agent_id and self.computation:
+                    break
+
+        if not self.computation:
+            self.computation = 'both'
+
+        # Step 2: Backfill categ_id on invoice lines from product
+        for line in self.invoice_line_ids:
+            if not line.categ_id and line.product_id:
+                line.categ_id = line.product_id.categ_id
+
+        # Step 3: Clear existing commission lines and recompute
+        for line in self.invoice_line_ids:
+            # Clear partner category commissions (agents)
+            if line.agents:
+                line.agents.unlink()
+            # Clear product category commissions
+            if line.product_categ_comm_ids:
+                line.product_categ_comm_ids.unlink()
+
+            # Recompute
+            if self.computation != 'product_categ':
+                line._get_agents_comms_per_category('partner')
+            if self.computation != 'partner_categ':
+                line._get_agents_comms_per_category('product')
+
+        _logger.info('Commissions recomputed for invoice %s: %d lines processed',
+                     self.display_name, len(self.invoice_line_ids))
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = [

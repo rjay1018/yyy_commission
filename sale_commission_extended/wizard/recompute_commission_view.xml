@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_commission_recompute_form" model="ir.ui.view">
+        <field name="name">sale.commission.recompute.form</field>
+        <field name="model">sale.commission.recompute</field>
+        <field name="arch" type="xml">
+            <form string="Recompute Commissions">
+                <group>
+                    <group string="Date Range">
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group string="Filters">
+                        <field name="agent_id"/>
+                        <field name="invoice_state"/>
+                    </group>
+                </group>
+                <div class="alert alert-info" role="alert" style="margin-bottom:0px;">
+                    <strong>Note:</strong> This will backfill missing product categories on invoice lines,
+                    clear existing commission lines, and recompute them using current partner commission
+                    configurations. Leave filters empty to process all customer invoices.
+                </div>
+                <footer>
+                    <button name="action_recompute" string="Recompute" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sale_commission_recompute" model="ir.actions.act_window">
+        <field name="name">Recompute Commissions</field>
+        <field name="res_model">sale.commission.recompute</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_sale_commission_recompute"
+        name="Recompute Commissions"
+        parent="sale_commission.menu_commission"
+        action="action_sale_commission_recompute"
+        sequence="90"/>
+
+</odoo>

@@ -24,6 +24,14 @@
             <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="before">
                 <field name="categ_id" required="1"/>
             </xpath>
+            <xpath expr="//button[@name='action_invoice_open']" position="before">
+                <button name="button_recompute_commissions"
+                    string="Recompute Commissions"
+                    type="object"
+                    class="oe_highlight"
+                    attrs="{'invisible': [('state', 'not in', ['open', 'paid'])]}"
+                    confirm="This will clear and recompute all commission lines. Continue?"/>
+            </xpath>
         </field>
     </record>
 
