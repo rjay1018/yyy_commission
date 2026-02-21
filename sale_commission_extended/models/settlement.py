@@ -107,7 +107,10 @@ class Settlement(models.Model):
     def button_recompute_lines(self):
         """Recompute commission amounts on all settlement lines."""
         for settlement in self:
+            if settlement.state != 'settled':
+                raise ValidationError(_("Only settlements in 'Settled' state can be recomputed."))
             settlement._recompute_settlement_lines()
+            
         return True
 
     @api.multi

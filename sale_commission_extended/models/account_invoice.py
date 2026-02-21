@@ -188,6 +188,18 @@ class AccountInvoiceLine(models.Model):
     #             obj.product_categ_comm_ids = [(0, 0, vals)]
 
 
+class AccountInvoiceLineAgent(models.Model):
+    _inherit = "account.invoice.line.agent"
+
+    @api.constrains('agent', 'amount')
+    def _check_settle_integrity(self):
+        for record in self:
+            if any(x.settlement.state == 'invoiced' for x in record.agent_line):
+                raise ValidationError(
+                    _("You can't modify an invoiced commission line"),
+                )
+
+
 class AccountInvoiceLineCateg(models.Model):
     _inherit = "sale.commission.line.mixin"
     _name = "account.invoice.line.categ"
@@ -263,9 +275,9 @@ class AccountInvoiceLineCateg(models.Model):
     @api.constrains('agent', 'amount')
     def _check_settle_integrity(self):
         for record in self:
-            if any(record.mapped('settled')):
-                raise exceptions.ValidationError(
-                    _("You can't modify a settled line"),
+            if any(x.settlement.state == 'invoiced' for x in record.agent_line_categ):
+                raise ValidationError(
+                    _("You can't modify an invoiced commission line"),
                 )
 
     def _skip_settlement(self):
