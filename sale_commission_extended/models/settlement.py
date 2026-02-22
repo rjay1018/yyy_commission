@@ -116,53 +116,19 @@ class Settlement(models.Model):
     @api.multi
     def _recompute_settlement_lines(self):
         """Recalculate commission amounts on the underlying agent lines
-        for both partner-category and product-category settlement lines.
+        by triggering their compute methods.
         """
         self.ensure_one()
 
         # Recompute partner category lines (sale.commission.settlement.line)
         for sline in self.lines:
-            for agent_line in sline.agent_line:
-                inv_line = agent_line.object_id
-                if not inv_line or not agent_line.commission:
-                    continue
-                amount = self._calc_commission_amount(
-                    agent_line.commission, inv_line.price_subtotal,
-                    inv_line.product_id, inv_line.quantity
-                )
-                if 'refund' in inv_line.invoice_id.type:
-                    amount = -amount
-                agent_line.write({'amount': amount})
+            if sline.agent_line:
+                sline.agent_line._compute_amount()
 
         # Recompute product category lines (sale.commission.settlement.line.categ)
         for sline in self.categ_lines:
-            for agent_line in sline.agent_line_categ:
-                inv_line = agent_line.object_id
-                if not inv_line or not agent_line.commission:
-                    continue
-                amount = self._calc_commission_amount(
-                    agent_line.commission, inv_line.price_subtotal,
-                    inv_line.product_id, inv_line.quantity
-                )
-                if 'refund' in inv_line.invoice_id.type:
-                    amount = -amount
-                agent_line.write({'amount': amount})
-
-    def _calc_commission_amount(self, commission, subtotal, product, quantity):
-        """Calculate commission amount using fix/pct/section logic."""
-        if product.commission_free or not commission:
-            return 0.0
-
-        if commission.amount_base_type == 'net_amount':
-            subtotal = max([0, subtotal - product.standard_price * quantity])
-
-        if commission.commission_type == 'fix':
-            return commission.fix_qty * quantity
-        elif commission.commission_type == 'pct':
-            return subtotal * (commission.fix_qty / 100.0)
-        elif commission.commission_type == 'section':
-            return commission.calculate_section(subtotal)
-        return 0.0
+            if sline.agent_line_categ:
+                sline.agent_line_categ._compute_amount()
 
 
 class SettlementLineCateg(models.Model):
