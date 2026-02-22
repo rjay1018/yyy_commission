@@ -131,6 +131,41 @@ class Settlement(models.Model):
                 sline.agent_line_categ._compute_amount()
 
 
+class SettlementLine(models.Model):
+    _inherit = "sale.commission.settlement.line"
+
+    based_commission_amount = fields.Monetary(
+        string="Based Commission Amount",
+        compute="_compute_based_amount",
+        store=True,
+    )
+
+    @api.depends(
+        'agent_line.object_id.price_subtotal',
+        'agent_line.object_id.product_id.standard_price',
+        'agent_line.object_id.quantity',
+        'agent_line.commission.amount_base_type'
+    )
+    def _compute_based_amount(self):
+        for line in self:
+            agent_line = line.agent_line[:1] if line.agent_line else False
+            if not agent_line or not agent_line.object_id:
+                line.based_commission_amount = 0.0
+                continue
+            
+            inv_line = agent_line.object_id
+            commission = agent_line.commission
+            subtotal = inv_line.price_subtotal
+
+            if commission and commission.amount_base_type == 'net_amount':
+                subtotal = max([0, subtotal - inv_line.product_id.standard_price * inv_line.quantity])
+            
+            # Refunds commissions are negative
+            if 'refund' in inv_line.invoice_id.type:
+                subtotal = -subtotal
+
+            line.based_commission_amount = subtotal
+
 class SettlementLineCateg(models.Model):
     _name = "sale.commission.settlement.line.categ"
 
@@ -162,6 +197,37 @@ class SettlementLineCateg(models.Model):
         comodel_name='res.company',
         related='settlement.company_id',
     )
+    based_commission_amount = fields.Monetary(
+        string="Based Commission Amount",
+        compute="_compute_based_amount",
+        store=True,
+    )
+
+    @api.depends(
+        'agent_line_categ.object_id.price_subtotal',
+        'agent_line_categ.object_id.product_id.standard_price',
+        'agent_line_categ.object_id.quantity',
+        'agent_line_categ.commission.amount_base_type'
+    )
+    def _compute_based_amount(self):
+        for line in self:
+            agent_line = line.agent_line_categ[:1] if line.agent_line_categ else False
+            if not agent_line or not agent_line.object_id:
+                line.based_commission_amount = 0.0
+                continue
+            
+            inv_line = agent_line.object_id
+            commission = agent_line.commission
+            subtotal = inv_line.price_subtotal
+
+            if commission and commission.amount_base_type == 'net_amount':
+                subtotal = max([0, subtotal - inv_line.product_id.standard_price * inv_line.quantity])
+            
+            # Refunds commissions are negative
+            if 'refund' in inv_line.invoice_id.type:
+                subtotal = -subtotal
+
+            line.based_commission_amount = subtotal
 
     @api.constrains('settlement', 'agent_line_categ')
     def _check_company(self):

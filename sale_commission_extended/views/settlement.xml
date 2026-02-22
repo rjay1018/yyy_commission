@@ -28,10 +28,14 @@
                             <field name="invoice"/>
                             <field name="invoice_line"/>
                             <field name="commission"/>
+                            <field name="based_commission_amount" sum="Total Based"/>
                             <field name="settled_amount" sum="Total"/>
                         </tree>
                     </field>
                 </group>
+            </xpath>
+            <xpath expr="//field[@name='lines']/tree/field[@name='settled_amount']" position="before">
+                <field name="based_commission_amount" sum="Total Based"/>
             </xpath>
             <xpath expr="//field[@name='lines']/tree/field[@name='settled_amount']" position="attributes">
                 <attribute name="sum">Total</attribute>

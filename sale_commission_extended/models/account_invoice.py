@@ -120,6 +120,8 @@ class AccountInvoiceLine(models.Model):
     @api.multi
     def _get_agents_comms_per_category(self, categ=''):
         for obj in self:
+            if getattr(obj, 'display_type', False) in ('line_note', 'line_section'):
+                continue
             agents_comms = obj._get_agent_comms(categ)
             for a in agents_comms:
                 amount = 0
@@ -198,6 +200,12 @@ class AccountInvoiceLineAgent(models.Model):
                 raise ValidationError(
                     _("You can't modify an invoiced commission line"),
                 )
+
+    def _skip_settlement(self):
+        res = super(AccountInvoiceLineAgent, self)._skip_settlement()
+        if getattr(self.object_id, 'display_type', False) in ('line_note', 'line_section'):
+            return True
+        return res
 
 
 class AccountInvoiceLineCateg(models.Model):
@@ -286,7 +294,12 @@ class AccountInvoiceLineCateg(models.Model):
         :return: bool
         """
         self.ensure_one()
-        return (
+        skip = (
             self.commission.invoice_state == 'paid' and
             self.invoice.state != 'paid'
         ) or (self.invoice.state not in ('open', 'paid'))
+        
+        if not skip and getattr(self.object_id, 'display_type', False) in ('line_note', 'line_section'):
+            skip = True
+            
+        return skip
